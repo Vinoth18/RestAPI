@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>REST Sample</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+	<style  type="text/css">
+	.ui-input-text {
+		vertical-align: middle;
+	}
+	</style>
+</head>
+<body>
+	<div data-role="page" id="detailsPage">
+		<div data-role="header" data-theme="b">
+			<h1>GeoIP Locator</h1>
+		</div>
+		<div data-role="content" data-theme="c">
+			<ul data-role="listview" id="detailView">
+				<li data-role="fieldcontain">
+					<div>
+						<div >
+							<label for="ipAddress" class="ui-input-text">IP address or Host Name</label>
+							<input type="text" placeholder = "173.194.38.169 or google.com" id="ipAddress"/>
+							<a href="#" id="showLocation" data-role="button" data-inline="true">Show Location</a>
+						</div>
+					</div>
+				</li>
+				<li data-role="fieldcontain">
+					<div>
+						<div >
+							<label for="map_canvas" class="ui-input-text">GeoIP Locator</label>
+						</div>
+						<div>
+							<div id="map_canvas" style="width:100%; height:300px"></div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+	<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			// Show the location on click of showLocation
+			$("#showLocation").on("click", function() {
+				var $address = $("#ipAddress").val();
+				if($address) {
+					var url = "http://freegeoip.net/json/" + $address + '?callback=initializeMap';
+					$.ajax({
+						url: url,
+						type: "GET",
+						dataType: "jsonp"
+					});
+				}
+			})
+		});
+
+		function initializeMap(data) {
+			var latitude = data.latitude,
+				longitude = data.longitude;
+			var latlng = new google.maps.LatLng(latitude, longitude);
+			// some initial values to the map
+			var myOptions = {
+				zoom: 10,
+				center: latlng,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};	 
+			// the map is created with all the information
+			var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);	 
+			// an extra step is needed to add the mark pointing to the place selected.
+			var marker = new google.maps.Marker({position:latlng,map:map,title:'title'});
+		}
+	</script>
+</body>
+</html>
